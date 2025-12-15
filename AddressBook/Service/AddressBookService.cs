@@ -19,5 +19,22 @@ namespace AddressBook.Service
         {
             return contactList;
         }
+        public void UpdateAddressBook(string firstName, string UpdatedlastName, string Updatedaddress, string Updatedcity, string Updatedstate, string Updatedzipcode, string Updatedemail)
+        {
+            for(int i=0;i<contactList.Count;i++)
+            {
+                if (contactList[i].FirstName == firstName)
+                {
+                    contactList[i].LastName = UpdatedlastName;
+                    contactList[i].Address = Updatedaddress;
+                    contactList[i].City = Updatedcity;
+                    contactList[i].State = Updatedstate;
+                    contactList[i].Email = Updatedemail;
+
+                }
+            }
+            Console.WriteLine("Employee updated successfully.");
+            return;
+        }
     }
 }

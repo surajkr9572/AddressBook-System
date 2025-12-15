@@ -52,9 +52,20 @@ namespace AddressBook.Entity
         public string PhoneNumber
         {
             get { return phoneNumber; }
-            private set { phoneNumber=value; }
-
+            set
+            {
+                string pattern = @"^[6-9]\d{9}$";
+                if (Regex.IsMatch(value, pattern))
+                {
+                    phoneNumber = value;
+                }
+                else
+                {
+                    throw new PhoneNumberException("Invalid phone number");
+                }
+            }
         }
+
         public string Email
         {
             get { return email; }

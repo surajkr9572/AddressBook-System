@@ -1,6 +1,7 @@
 ﻿using AddressBook.Entity;
 using AddressBook.Interface;
 using AddressBook.Service;
+using System;
 
 namespace AddressBook
 {
@@ -8,103 +9,127 @@ namespace AddressBook
     {
         static void Main(string[] args)
         {
-            IAddressBook addressbook=new AddressBookService();
-            Contacts contact = new Contacts();
-            Console.WriteLine("Enter First Name : ");
-            contact.FirstName = Console.ReadLine();
+            string banner =
+                "   ___     __   __                  ___            __  \r\n  / _ |___/ /__/ /______ ___ ___   / _ )___  ___  / /__\r\n / __ / _  / _  / __/ -_|_-<(_-<  / _  / _ \\/ _ \\/  '_/\r\n/_/ |_\\_,_/\\_,_/_/  \\__/___/___/ /____/\\___/\\___/_/\\_\\ \r\n";
+            Console.WriteLine(banner);
+            IAddressBook addressbook = new AddressBookService();
+            int val;
 
-            Console.WriteLine("Enter Last Name : ");
-            contact.LastName = Console.ReadLine();
+            do
+            {
+                Console.WriteLine("\n------ Address Book Menu ------");
+                Console.WriteLine("Add Enter 1");
+                Console.WriteLine("Edit Enter 2");
+                Console.WriteLine("Delete Enter 3");
+                Console.WriteLine("Get All List Enter 4");
+                Console.WriteLine("Exit Enter 5");
 
-            Console.WriteLine("Enter Address : ");
-            contact.Address = Console.ReadLine();
+                if (!int.TryParse(Console.ReadLine(), out val))
+                {
+                    Console.WriteLine("Invalid input. Enter number only.");
+                    continue;
+                }
 
-            Console.WriteLine("Enter City : ");
-            contact.City = Console.ReadLine();
+                switch (val)
+                {
+                    case 1:
+                        Contacts contact = new Contacts();
 
-            Console.WriteLine("Enter State: ");
-            contact.State = Console.ReadLine();
+                        Console.Write("Enter First Name: ");
+                        contact.FirstName = Console.ReadLine();
 
-            Console.Write("Enter Zip Code: ");
-            contact.ZipCode = Console.ReadLine();
+                        Console.Write("Enter Last Name: ");
+                        contact.LastName = Console.ReadLine();
 
-            Console.Write("Enter Phone Number: ");
-            contact.PhoneNumber = Console.ReadLine();
+                        Console.Write("Enter Address: ");
+                        contact.Address = Console.ReadLine();
 
-            Console.Write("Enter Email: ");
-            contact.Email = Console.ReadLine();
+                        Console.Write("Enter City: ");
+                        contact.City = Console.ReadLine();
 
-            addressbook.AddContact(contact);
+                        Console.Write("Enter State: ");
+                        contact.State = Console.ReadLine();
 
+                        Console.Write("Enter Zip Code: ");
+                        contact.ZipCode = Console.ReadLine();
 
-            Console.WriteLine("Enter First Name : ");
-            contact.FirstName = Console.ReadLine();
+                        Console.Write("Enter Phone Number: ");
+                        contact.PhoneNumber = Console.ReadLine();
 
-            Console.WriteLine("Enter Last Name : ");
-            contact.LastName = Console.ReadLine();
+                        Console.Write("Enter Email: ");
+                        contact.Email = Console.ReadLine();
 
-            Console.WriteLine("Enter Address : ");
-            contact.Address = Console.ReadLine();
+                        addressbook.AddContact(contact);
+                        Console.WriteLine("Contact Added Successfully!");
+                        break;
 
-            Console.WriteLine("Enter City : ");
-            contact.City = Console.ReadLine();
+                    case 2:
+                        Console.Write("Enter First Name to Edit: ");
+                        string editFirstName = Console.ReadLine();
 
-            Console.WriteLine("Enter State: ");
-            contact.State = Console.ReadLine();
+                        Console.Write("Enter New Last Name: ");
+                        string editLastName = Console.ReadLine();
 
-            Console.Write("Enter Zip Code: ");
-            contact.ZipCode = Console.ReadLine();
+                        Console.Write("Enter New Address: ");
+                        string editAddress = Console.ReadLine();
 
-            Console.Write("Enter Phone Number: ");
-            contact.PhoneNumber = Console.ReadLine();
+                        Console.Write("Enter New City: ");
+                        string editCity = Console.ReadLine();
 
-            Console.Write("Enter Email: ");
-            contact.Email = Console.ReadLine();
+                        Console.Write("Enter New State: ");
+                        string editState = Console.ReadLine();
 
-            addressbook.AddContact(contact);
-            Console.WriteLine("Contact added successfully!");
+                        Console.Write("Enter New Zip Code: ");
+                        string editZip = Console.ReadLine();
 
+                        Console.Write("Enter New Email: ");
+                        string editEmail = Console.ReadLine();
 
+                        addressbook.UpdateAddressBook(
+                            editFirstName,
+                            editLastName,
+                            editAddress,
+                            editCity,
+                            editState,
+                            editZip,
+                            editEmail
+                        );
 
+                        Console.WriteLine("Contact Updated Successfully!");
+                        break;
 
+                    case 3:
+                        Console.Write("Enter First Name to Delete: ");
+                        string deleteName = Console.ReadLine();
+                        addressbook.DeletePerson(deleteName);
+                        Console.WriteLine("Contact Deleted Successfully!");
+                        break;
 
-            Console.WriteLine("---- Edit Contact ----");
+                    case 4:
+                        var list = addressbook.GetAllContacts();
 
-            Console.Write("Enter First Name to Edit: ");
-            string EditFirstName1 = Console.ReadLine();
+                        Console.WriteLine(
+                               $"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
 
-            Console.Write("Enter New Last Name: ");
-            string EditLastName1 = Console.ReadLine();
+                        Console.WriteLine(new string('-', 80));
 
-            Console.Write("Enter New Address: ");
-            string EditAddress1 = Console.ReadLine();
+                        foreach (var e in list)
+                        {
+                            Console.WriteLine(
+                                $"{e.FirstName,-12} {e.LastName,-12} {e.City,-10} {e.State,-8} {e.ZipCode,-8} {e.PhoneNumber,-12} {e.Email}");
+                        }
+                        break;
 
-            Console.Write("Enter New City: ");
-            string EditCity1 = Console.ReadLine();
+                    case 5:
+                        Console.WriteLine("Exiting Address Book...");
+                        break;
 
-            Console.Write("Enter New State: ");
-            string EditState1 = Console.ReadLine();
+                    default:
+                        Console.WriteLine("Invalid choice. Please enter 1 to 5.");
+                        break;
+                }
 
-            Console.Write("Enter New Zip Code: ");
-            string EditZipCode1 = Console.ReadLine();
-
-            Console.Write("Enter New Email: ");
-            string EditEmail1 = Console.ReadLine();
-
-            addressbook.UpdateAddressBook(
-                EditFirstName1,
-                EditLastName1,
-                EditAddress1,
-                EditCity1,
-                EditState1,
-                EditZipCode1,
-                EditEmail1
-            );
-
-
-            Console.WriteLine("Enter Person Name for delete...");
-            string deletePerson= Console.ReadLine();
-            addressbook.DeletePerson(deletePerson);
+            } while (val != 5);
         }
     }
 }

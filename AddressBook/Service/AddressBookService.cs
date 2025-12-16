@@ -25,7 +25,7 @@ namespace AddressBook.Service
         {
             for(int i=0;i<contactList.Count;i++)
             {
-                if (contactList[i].FirstName == firstName)
+                if (contactList[i].FirstName.ToLower() == firstName.ToLower())
                 {
                     contactList[i].LastName = UpdatedlastName;
                     contactList[i].Address = Updatedaddress;
@@ -40,17 +40,12 @@ namespace AddressBook.Service
         }
         public void DeletePerson(string name)
         {
-            count=contactList.Count;
-            for(int i = 0; i < count; i++)
+            
+            for(int i = 0; i < contactList.Count; i++)
             {
-                if (contactList[i].FirstName.Equals(name))
+                if (contactList[i].FirstName.ToLower()==name.ToLower())
                 {
-                    for(int j = i; j < count-1; j++)
-                    {
-                        contactList[j] = contactList[j + 1];
-                    }
-                    contactList[count - 1] = null;
-                    count--;
+                    contactList.Remove(contactList[i]);
                     Console.WriteLine("Person Deleted Successfully...");
                     return;
                 }

@@ -87,5 +87,17 @@ namespace AddressBook.Entity
                 }
             }
         }
+        public override bool Equals(object obj)
+        {
+            if(obj == null) return false;
+            if(obj.GetType() == this.GetType())
+            {
+                return true;
+            }
+            if(ReferenceEquals(this,obj) ) return true;
+            Contacts contactsobj=obj as Contacts;
+            return contactsobj.FirstName == FirstName;
+
+        }
     }
 }

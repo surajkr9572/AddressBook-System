@@ -2,6 +2,7 @@
 using AddressBook.Interface;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 
 namespace AddressBook.Service
@@ -43,14 +44,21 @@ namespace AddressBook.Service
             }
 
             var list = addressBooks[currentBookName];
-            foreach (var c in list)
+            //foreach (var c in list)
+            //{
+            //    if (c.FirstName.ToLower() == contact.FirstName.ToLower())
+            //    {
+            //        Console.WriteLine("Contact with this First Name already exists in current Address Book.");
+            //        return;
+            //    }
+            //}
+            var duplicateName=list.Find(c=>c.Equals(contact));
+            if(duplicateName != null)
             {
-                if (c.FirstName.ToLower() == contact.FirstName.ToLower())
-                {
-                    Console.WriteLine("Contact with this First Name already exists in current Address Book.");
-                    return;
-                }
+                Console.WriteLine("Enter Person already Exists in my Current Address Book...");
+                return;
             }
+
 
             list.Add(contact);
             Console.WriteLine("Contact added successfully.");

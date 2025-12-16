@@ -12,5 +12,6 @@ namespace AddressBook.Interface
         void AddContact(Contacts contact);
         List<Contacts> GetAllContacts();
         void UpdateAddressBook(string FirstName, string uLastName, string uAddress, string uCity, string uState, string uZipcode, string uEmail);
+        void DeletePerson(string name);
     }
 }

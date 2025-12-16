@@ -2,6 +2,7 @@
 using AddressBook.Interface;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace AddressBook.Service
     public class AddressBookService : IAddressBook
     {
         private List<Contacts> contactList = new List<Contacts>();
+        int count = 0;
         public void AddContact(Contacts  contacts)
         {
             contactList.Add(contacts);
@@ -36,5 +38,25 @@ namespace AddressBook.Service
             Console.WriteLine("Employee updated successfully.");
             return;
         }
+        public void DeletePerson(string name)
+        {
+            count=contactList.Count;
+            for(int i = 0; i < count; i++)
+            {
+                if (contactList[i].FirstName.Equals(name))
+                {
+                    for(int j = i; j < count-1; j++)
+                    {
+                        contactList[j] = contactList[j + 1];
+                    }
+                    contactList[count - 1] = null;
+                    count--;
+                    Console.WriteLine("Person Deleted Successfully...");
+                    return;
+                }
+            }
+            Console.WriteLine("Person not found...");
+        }
+
     }
 }

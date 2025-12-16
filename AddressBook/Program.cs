@@ -101,7 +101,10 @@ namespace AddressBook
                 EditEmail1
             );
 
-            
+
+            Console.WriteLine("Enter Person Name for delete...");
+            string deletePerson= Console.ReadLine();
+            addressbook.DeletePerson(deletePerson);
         }
     }
 }

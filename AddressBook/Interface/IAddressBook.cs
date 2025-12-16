@@ -13,5 +13,8 @@ namespace AddressBook.Interface
         List<Contacts> GetAllContacts();
         void UpdateAddressBook(string FirstName, string uLastName, string uAddress, string uCity, string uState, string uZipcode, string uEmail);
         void DeletePerson(string name);
+        bool SelectAddressBook(string bookName);
+        bool CreateAddressBook(string bookName);
+        List<string> GetAllAddressBookNames();
     }
 }

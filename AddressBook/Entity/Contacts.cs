@@ -22,7 +22,12 @@ namespace AddressBook.Entity
         public string FirstName
         {
             get { return firstName; }
-            set { firstName= value; }
+            private set { firstName = value; }
+        }
+
+        public Contacts(string firstName)
+        {
+            this.firstName = firstName;
         }
         public string LastName
         {

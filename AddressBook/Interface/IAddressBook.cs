@@ -16,5 +16,8 @@ namespace AddressBook.Interface
         bool SelectAddressBook(string bookName);
         bool CreateAddressBook(string bookName);
         List<string> GetAllAddressBookNames();
+
+        List<Contacts> SearchCity(string city);
+        List<Contacts> SearchState(string state);
     }
 }

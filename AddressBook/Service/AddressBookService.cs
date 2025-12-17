@@ -52,8 +52,8 @@ namespace AddressBook.Service
             //        return;
             //    }
             //}
-            var duplicateName=list.Find(c=>c.Equals(contact));
-            if(duplicateName != null)
+            var duplicateName = list.Find(c => c.Equals(contact));
+            if (duplicateName != null)
             {
                 Console.WriteLine("Enter Person already Exists in my Current Address Book...");
                 return;
@@ -146,6 +146,21 @@ namespace AddressBook.Service
         public List<string> GetAllAddressBookNames()
         {
             return new List<string>(addressBooks.Keys);
+        }
+        public List<Contacts> SearchCity(string cityName)
+        {
+            return addressBooks
+                .SelectMany(kvp => kvp.Value)
+                .Where(c => c.City.Equals(cityName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        public List<Contacts> SearchState(string stateName)
+        {
+            return addressBooks
+                .SelectMany(kvp => kvp.Value)
+                .Where(c => c.State.Equals(stateName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using AddressBook.Entity;
+using AddressBook.Exceptions;
 using AddressBook.Interface;
 using AddressBook.Service;
 using System;
+using System.Collections.Generic;
 
 namespace AddressBook
 {
@@ -12,183 +14,355 @@ namespace AddressBook
             string banner =
                 "   ___     __   __                  ___            __  \r\n  / _ |___/ /__/ /______ ___ ___   / _ )___  ___  / /__\r\n / __ / _  / _  / __/ -_|_-<(_-<  / _  / _ \\/ _ \\/  '_/\r\n/_/ |_\\_,_/\\_,_/_/  \\__/___/___/ /____/\\___/\\___/_/\\_\\ \r\n";
             Console.WriteLine(banner);
-            Dictionary<string, IAddressBook> addressBooks = new Dictionary<string, IAddressBook>();
-            IAddressBook currentBook = null;
+            IAddressBook service = new AddressBookService();
 
-            int mainChoice;
-
+            int mainChoice=0;
+            
             do
             {
-                Console.WriteLine("\n==== MAIN MENU ====");
-                Console.WriteLine("1. Create Address Book");
-                Console.WriteLine("2. Select Address Book");
-                Console.WriteLine("3. Exit");
-
-                if (!int.TryParse(Console.ReadLine(), out mainChoice))
+                try
                 {
-                    Console.WriteLine("Invalid input");
-                    continue;
-                }
+                    Console.WriteLine("\n==== MAIN MENU ====");
+                    Console.WriteLine("1. Create Address Book");
+                    Console.WriteLine("2. Select Address Book");
+                    Console.WriteLine("3. Search Using City (Across All Address Books)");
+                    Console.WriteLine("4. Search Using State (Across All Address Books)");
+                    Console.WriteLine("5. Exit");
 
-                switch (mainChoice)
-                {
-                    case 1: // Create
-                        Console.Write("Enter New Address Book Name: ");
-                        string newBookName = Console.ReadLine();
+                    if (!int.TryParse(Console.ReadLine(), out mainChoice))
+                    {
+                        Console.WriteLine("Invalid input");
+                        continue;
+                    }
 
-                        if (addressBooks.ContainsKey(newBookName))
-                        {
-                            Console.WriteLine("Address Book already exists!");
-                        }
-                        else
-                        {
-                            currentBook = new AddressBookService();           // new service object
-                            if (currentBook.CreateAddressBook(newBookName))  // call method to set currentBookName
+                    switch (mainChoice)
+                    {
+                        case 1: // Create
+                            Console.Write("Enter New Address Book Name: ");
+                            string newBookName = Console.ReadLine();
+
+                            if (!service.CreateAddressBook(newBookName))
                             {
-                                addressBooks[newBookName] = currentBook;     // store in dictionary
+                                throw new AddressBookExists("Address Book already exists!");
+                            }
+                            else
+                            {
+                                if (string.IsNullOrWhiteSpace(newBookName))
+                                {
+                                    throw new InvalidAddressBook("Enter Valid AddressBook Name : ");
+                                }
                                 Console.WriteLine($"Address Book '{newBookName}' created and selected.");
-                                AddressBookMenu(currentBook);
+                                AddressBookMenu(service);
                             }
-                        }
-                        break;
+                            break;
 
-                    case 2: // Select
-                        Console.Write("Enter Address Book Name to Select: ");
-                        string selectBookName = Console.ReadLine();
-
-                        if (addressBooks.TryGetValue(selectBookName, out currentBook))
-                        {
-                            if (currentBook.SelectAddressBook(selectBookName)) // set currentBookName internally
+                        case 2: // Select
+                            Console.Write("Enter Address Book Name to Select: ");
+                            string selectBookName = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(selectBookName))
                             {
-                                Console.WriteLine($"Address Book '{selectBookName}' selected.");
-                                AddressBookMenu(currentBook);
+                                throw new InvalidAddressBook("Enter Valid AddressBook Name : ");
                             }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Address Book not found!");
-                        }
-                        break;
+                            else
+                            {
+                                if (service.SelectAddressBook(selectBookName))
+                                {
+                                    Console.WriteLine($"Address Book '{selectBookName}' selected.");
+                                    AddressBookMenu(service);
+                                }
+                                else
+                                {
+                                    throw new AddressBookNotExists("Address Book not found!");
+                                }
+                            }
+                            break;
 
+                        case 3: // Search Using City across all books
+                            Console.Write("Enter City Name : ");
+                            string cityName = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(cityName))
+                            {
+                                throw new CityNameInvalid("City Name Invalid. Enter valid City Name.");
+                            }
 
-                    case 3:
-                        Console.WriteLine("Exiting Application...");
-                        break;
+                            var cityList = service.SearchCity(cityName);
+                            if (cityList.Count == 0)
+                            {
+                                Console.WriteLine($"No persons found in city '{cityName}'.");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"\nPersons in city '{cityName}':");
+                                foreach (var c in cityList)
+                                {
+                                    Console.WriteLine($"{c.FirstName} {c.LastName} - {c.Address} - {c.City} - {c.State} - {c.ZipCode} - {c.PhoneNumber} - {c.Email}");
+                                }
+                            }
+                            break;
 
-                    default:
-                        Console.WriteLine("Invalid option");
-                        break;
+                        case 4: // Search Using State across all books
+                            Console.Write("Enter State Name : ");
+                            string stateName = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(stateName))
+                            {
+                                throw new StateNameInvalid("State Name Invalid. Enter valid State Name.");
+                            }
+
+                            var stateList = service.SearchState(stateName);
+                            if (stateList.Count == 0)
+                            {
+                                Console.WriteLine($"No persons found in state '{stateName}'.");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"\nPersons in state '{stateName}':");
+                                foreach (var c in stateList)
+                                {
+                                    Console.WriteLine($"{c.FirstName} {c.LastName} - {c.Address} - {c.City} - {c.State} - {c.ZipCode} - {c.PhoneNumber} - {c.Email}");
+                                }
+                            }
+                            break;
+
+                        case 5:
+                            Console.WriteLine("Exiting Application...");
+                            break;
+
+                        default:
+                            Console.WriteLine("Invalid option");
+                            break;
+                    }
+                }
+                catch (InvalidAddressBook ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (AddressBookExists ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (AddressBookNotExists ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (CityNameInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (StateNameInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    PrintError("Unexpected Error : " + ex.Message);
                 }
 
-            } while (mainChoice != 3);
+
+            } while (mainChoice != 5); 
         }
+
         static void AddressBookMenu(IAddressBook addressbook)
         {
-            int choice;
+            int choice=0;
 
             do
             {
-                Console.WriteLine("\n--- ADDRESS BOOK MENU ---");
-                Console.WriteLine("1. Add Contact");
-                Console.WriteLine("2. Edit Contact");
-                Console.WriteLine("3. Delete Contact");
-                Console.WriteLine("4. View Contacts");
-                Console.WriteLine("5. Back to Main Menu");
-
-                if (!int.TryParse(Console.ReadLine(), out choice))
+                try
                 {
-                    Console.WriteLine("Invalid input");
-                    continue;
-                }
+                    Console.WriteLine("\n--- ADDRESS BOOK MENU ---");
+                    Console.WriteLine("1. Add Contact");
+                    Console.WriteLine("2. Edit Contact");
+                    Console.WriteLine("3. Delete Contact");
+                    Console.WriteLine("4. View Contacts");
+                    Console.WriteLine("5. Back to Main Menu");
 
-                switch (choice)
-                {
-                    case 1:
-                        
+                    if (!int.TryParse(Console.ReadLine(), out choice))
+                    {
+                        Console.WriteLine("Invalid input");
+                        continue;
+                    }
 
-                        Console.Write("First Name: ");
-                        string FirstName= Console.ReadLine();
-                        Contacts contact = new Contacts(FirstName);
-                        Console.Write("Last Name: ");
-                        contact.LastName = Console.ReadLine();
+                    switch (choice)
+                    {
+                        case 1:
+                            string FirstName = ReadRequiredInput(
+                                "First Name: ",
+                                "First Name Invalid. Enter valid First Name."
+                            );
 
-                        Console.Write("Address: ");
-                        contact.Address = Console.ReadLine();
+                            Contacts contact = new Contacts(FirstName);
 
-                        Console.Write("City: ");
-                        contact.City = Console.ReadLine();
+                            contact.LastName = ReadRequiredInput(
+                                "Last Name: ",
+                                "Last Name Invalid. Enter valid Last Name."
+                            );
 
-                        Console.Write("State: ");
-                        contact.State = Console.ReadLine();
+                            contact.Address = ReadRequiredInput(
+                                "Address: ",
+                                "Address Invalid. Enter valid Address."
+                            );
 
-                        Console.Write("Zip: ");
-                        contact.ZipCode = Console.ReadLine();
+                            contact.City = ReadRequiredInput(
+                                "City: ",
+                                "City Name Invalid. Enter valid City Name."
+                            );
 
-                        Console.Write("Phone Number: ");
-                        contact.PhoneNumber = Console.ReadLine();
+                            contact.State = ReadRequiredInput(
+                                "State: ",
+                                "State Name Invalid. Enter valid State Name."
+                            );
 
-                        Console.Write("Email: ");
-                        contact.Email = Console.ReadLine();
+                            contact.ZipCode = ReadRequiredInput(
+                                "Zip: ",
+                                "Zip Code Invalid. Enter valid Zip Code."
+                            );
 
-                        addressbook.AddContact(contact);
-                        Console.WriteLine("Contact Added!");
-                        break;
+                            contact.PhoneNumber = ReadRequiredInput(
+                                "Phone Number: ",
+                                "Phone Number Invalid. Enter valid Phone Number."
+                            );
 
-                    case 2:
-                        Console.Write("Enter First Name to Edit: ");
-                        string Name = Console.ReadLine();
+                            contact.Email = ReadRequiredInput(
+                                "Email: ",
+                                "Email Invalid. Enter valid Email."
+                            );
 
-                        Console.Write("New Last Name: ");
-                        string editlastname = Console.ReadLine();
+                            addressbook.AddContact(contact);
+                            Console.WriteLine("Contact Added Successfully!");
+                            break;
 
-                        Console.Write("New Address: ");
-                        string editaddr = Console.ReadLine();
 
-                        Console.Write("New City: ");
-                        string editcity = Console.ReadLine();
+                        case 2:
+                            string Name = ReadRequiredInput(
+                                "Enter First Name to Edit: ",
+                                "First Name Invalid. Enter valid First Name."
+                            );
 
-                        Console.Write("New State: ");
-                        string editstate = Console.ReadLine();
+                            string editlastname = ReadRequiredInput(
+                                "New Last Name: ",
+                                "Last Name Invalid. Enter valid Last Name."
+                            );
 
-                        Console.Write("New Zip: ");
-                        string editzip = Console.ReadLine();
+                            string editaddr = ReadRequiredInput(
+                                "New Address: ",
+                                "Address Invalid. Enter valid Address."
+                            );
 
-                        Console.Write("New Email: ");
-                        string editemail = Console.ReadLine();
+                            string editcity = ReadRequiredInput(
+                                "New City: ",
+                                "City Name Invalid. Enter valid City Name."
+                            );
 
-                        addressbook.UpdateAddressBook(Name, editlastname, editaddr, editcity, editstate, editzip, editemail);
-                        break;
+                            string editstate = ReadRequiredInput(
+                                "New State: ",
+                                "State Name Invalid. Enter valid State Name."
+                            );
 
-                    case 3:
-                        Console.Write("Enter First Name to Delete: ");
-                        string delName = Console.ReadLine();
-                        addressbook.DeletePerson(delName);
-                        break;
+                            string editzip = ReadRequiredInput(
+                                "New Zip: ",
+                                "Zip Code Invalid. Enter valid Zip Code."
+                            );
 
-                    case 4:
-                        var list = addressbook.GetAllContacts();
+                            string editemail = ReadRequiredInput(
+                                "New Email: ",
+                                "Email Invalid. Enter valid Email."
+                            );
 
-                        Console.WriteLine(
-                            $"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
-                        Console.WriteLine(new string('-', 80));
+                            addressbook.UpdateAddressBook(Name, editlastname, editaddr, editcity, editstate, editzip, editemail);
 
-                        foreach (var c in list)
-                        {
+                            Console.WriteLine("Contact Updated Successfully!");
+                            break;
+
+
+                        case 3:
+                            Console.Write("Enter First Name to Delete: ");
+                            string delName = Console.ReadLine();
+                            addressbook.DeletePerson(delName);
+                            break;
+
+                        case 4:
+                            var list = addressbook.GetAllContacts();
+
                             Console.WriteLine(
-                                $"{c.FirstName,-12} {c.LastName,-12} {c.City,-10} {c.State,-8} {c.ZipCode,-8} {c.PhoneNumber,-12} {c.Email}");
-                        }
-                        break;
+                                $"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                            Console.WriteLine(new string('-', 80));
 
-                    case 5:
-                        Console.WriteLine("Returning to Main Menu...");
-                        break;
+                            foreach (var c in list)
+                            {
+                                Console.WriteLine(
+                                    $"{c.FirstName,-12} {c.LastName,-12} {c.City,-10} {c.State,-8} {c.ZipCode,-8} {c.PhoneNumber,-12} {c.Email}");
+                            }
+                            break;
 
-                    default:
-                        Console.WriteLine("Invalid option");
-                        break;
+                        case 5:
+                            Console.WriteLine("Returning to Main Menu...");
+                            break;
+
+                        default:
+                            Console.WriteLine("Invalid option");
+                            break;
+                    }
+                }
+                catch (FirstNameInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (LastNameInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (AddressInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (CityNameInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (StateNameInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (ZipInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (PhoneInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (EmailInvalid ex)
+                {
+                    PrintError(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    PrintError("Unexpected Error : " + ex.Message);
                 }
 
             } while (choice != 5);
         }
+        static void PrintError(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("ERROR : " + message);
+            Console.ResetColor();
+        }
+        static string ReadRequiredInput(string label, string errorMessage)
+        {
+            while (true)
+            {
+                Console.Write(label);
+                string input = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(input))
+                    return input;
+
+                PrintError(errorMessage);
+            }
+        }
+
+
     }
+
 }

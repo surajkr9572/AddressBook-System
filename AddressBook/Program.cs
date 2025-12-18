@@ -27,7 +27,9 @@ namespace AddressBook
                     Console.WriteLine("2. Select Address Book");
                     Console.WriteLine("3. Search Using City (Across All Address Books)");
                     Console.WriteLine("4. Search Using State (Across All Address Books)");
-                    Console.WriteLine("5. Exit");
+                    Console.WriteLine("5. Count By City (Across All Address Books)");
+                    Console.WriteLine("6. Count By State (Across All Address Books)");
+                    Console.WriteLine("7. Exit");
 
                     if (!int.TryParse(Console.ReadLine(), out mainChoice))
                     {
@@ -126,13 +128,33 @@ namespace AddressBook
                                 }
                             }
                             break;
-
-                        case 5:
+                        case 5: //Count How many person are in same city
+                            Console.Write("Enter City Name : ");
+                            string CityName_Count=Console.ReadLine();
+                            if(string.IsNullOrWhiteSpace(CityName_Count))
+                            {
+                                throw new CityNameInvalid("City Name Invalid. Enter valid City Name.");
+                            }
+                            int cityCount= service.CountCity(CityName_Count);
+                            Console.WriteLine($"{cityCount} Present is {CityName_Count} City.");
+                            break;
+                        case 6: //Count How many person are in same state
+                            Console.Write("Enter State Name : ");
+                            string StateName_Count = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(StateName_Count))
+                            {
+                                throw new CityNameInvalid("City Name Invalid. Enter valid City Name.");
+                            }
+                            int StateCount = service.CountState(StateName_Count);
+                            Console.WriteLine($"{StateCount} Present is {StateName_Count} State.");
+                            break;
+                        case 7:
                             Console.WriteLine("Exiting Application...");
                             break;
 
                         default:
                             Console.WriteLine("Invalid option");
+                           
                             break;
                     }
                 }
@@ -162,7 +184,7 @@ namespace AddressBook
                 }
 
 
-            } while (mainChoice != 5); 
+            } while (mainChoice != 7); 
         }
 
         static void AddressBookMenu(IAddressBook addressbook)

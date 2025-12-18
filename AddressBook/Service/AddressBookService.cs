@@ -199,5 +199,25 @@ namespace AddressBook.Service
             return result;
 
         }
+        //count person in same city
+        public int CountCity(string cityName)
+        {
+            int count = 0;
+            if (cityPersonMap.ContainsKey(cityName))
+            {
+                count= cityPersonMap[cityName].Count;
+            }
+            return count;
+        }
+        //count person in same state
+        public int CountState(string stateName)
+        {
+            int count = 0;
+            if (statePersonMap.ContainsKey(stateName))
+            {
+                count= statePersonMap[stateName].Count;
+            }
+            return count;
+        }
     }
 }

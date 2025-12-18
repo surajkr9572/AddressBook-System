@@ -19,5 +19,7 @@ namespace AddressBook.Interface
 
         List<Contacts> SearchCity(string city);
         List<Contacts> SearchState(string state);
+        int CountCity(string city);
+        int CountState(string state);
     }
 }

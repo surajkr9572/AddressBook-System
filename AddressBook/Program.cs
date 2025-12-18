@@ -93,6 +93,8 @@ namespace AddressBook
                             else
                             {
                                 Console.WriteLine($"\nPersons in city '{cityName}':");
+                                Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                                Console.WriteLine(new string('-', 80));
                                 foreach (var c in cityList)
                                 {
                                     Console.WriteLine($"{c.FirstName} {c.LastName} - {c.Address} - {c.City} - {c.State} - {c.ZipCode} - {c.PhoneNumber} - {c.Email}");
@@ -116,6 +118,8 @@ namespace AddressBook
                             else
                             {
                                 Console.WriteLine($"\nPersons in state '{stateName}':");
+                                Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                                Console.WriteLine(new string('-', 80));
                                 foreach (var c in stateList)
                                 {
                                     Console.WriteLine($"{c.FirstName} {c.LastName} - {c.Address} - {c.City} - {c.State} - {c.ZipCode} - {c.PhoneNumber} - {c.Email}");
@@ -283,8 +287,7 @@ namespace AddressBook
                         case 4:
                             var list = addressbook.GetAllContacts();
 
-                            Console.WriteLine(
-                                $"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                            Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
                             Console.WriteLine(new string('-', 80));
 
                             foreach (var c in list)

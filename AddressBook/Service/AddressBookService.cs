@@ -11,7 +11,8 @@ namespace AddressBook.Service
     {
         private Dictionary<string, List<Contacts>> addressBooks = new Dictionary<string, List<Contacts>>();
         private string currentBookName = null;
-
+        private Dictionary<string,List<Contacts>>cityPersonMap=new Dictionary<string, List<Contacts>>();
+        private Dictionary<string,List<Contacts>>statePersonMap=new Dictionary<string, List<Contacts>>();
         // Create a new address book and set it as current
         public bool CreateAddressBook(string bookName)
         {
@@ -62,6 +63,20 @@ namespace AddressBook.Service
 
             list.Add(contact);
             Console.WriteLine("Contact added successfully.");
+
+            //add person contactList by city wise.
+            if (!cityPersonMap.ContainsKey(contact.City))
+            {
+                cityPersonMap[contact.City] = new List<Contacts>();
+            }
+            cityPersonMap[contact.City].Add(contact);
+
+            if (!statePersonMap.ContainsKey(contact.City))
+            {
+                statePersonMap[contact.State] = new List<Contacts>();
+            }
+            statePersonMap[contact.State].Add(contact);
+
         }
 
         // Get all contacts from the current address book
@@ -149,18 +164,40 @@ namespace AddressBook.Service
         }
         public List<Contacts> SearchCity(string cityName)
         {
-            return addressBooks
-                .SelectMany(kvp => kvp.Value)
-                .Where(c => c.City.Equals(cityName, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            List<Contacts> result = new List<Contacts>();
+
+            foreach (var entry in addressBooks)
+            {
+                foreach (Contacts c in entry.Value)
+                {
+                    if (c.City.ToLower()==cityName.ToLower())
+                    {
+                        result.Add(c);
+                    }
+                }
+            }
+
+            return result;
         }
 
         public List<Contacts> SearchState(string stateName)
         {
-            return addressBooks
-                .SelectMany(kvp => kvp.Value)
-                .Where(c => c.State.Equals(stateName, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            List<Contacts> result = new List<Contacts>();
+
+            foreach (var entry in addressBooks)
+            {
+                foreach (Contacts c in entry.Value)
+                {
+                    if (c.State != null &&
+                        c.State.ToLower() == stateName.ToLower())
+                    {
+                        result.Add(c);
+                    }
+                }
+            }
+
+            return result;
+
         }
     }
 }

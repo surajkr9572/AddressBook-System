@@ -29,7 +29,8 @@ namespace AddressBook
                     Console.WriteLine("4. Search Using State (Across All Address Books)");
                     Console.WriteLine("5. Count By City (Across All Address Books)");
                     Console.WriteLine("6. Count By State (Across All Address Books)");
-                    Console.WriteLine("7. Exit");
+                    Console.WriteLine("7. Sort Contacts");
+                    Console.WriteLine("8. Exit");
 
                     if (!int.TryParse(Console.ReadLine(), out mainChoice))
                     {
@@ -149,7 +150,7 @@ namespace AddressBook
                             Console.WriteLine($"{StateCount} Present is {StateName_Count} State.");
                             break;
                         case 7:
-                            Console.WriteLine("Exiting Application...");
+                            Sort(service);
                             break;
 
                         default:
@@ -308,13 +309,14 @@ namespace AddressBook
 
                         case 4:
                             var list = addressbook.GetAllContacts();
-                            list.Sort();
-                            Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"Address",-12}{"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
-                            Console.WriteLine(new string('-', 90));
+
+                            Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                            Console.WriteLine(new string('-', 80));
 
                             foreach (var c in list)
                             {
-                                Console.WriteLine(c);
+                                Console.WriteLine(
+                                    $"{c.FirstName,-12} {c.LastName,-12} {c.City,-10} {c.State,-8} {c.ZipCode,-8} {c.PhoneNumber,-12} {c.Email}");
                             }
                             break;
 
@@ -384,6 +386,98 @@ namespace AddressBook
 
                 PrintError(errorMessage);
             }
+        }
+        public static void Sort(IAddressBook addressbook)
+        {
+            int choice = 0;
+
+            do
+            {
+                try
+                {
+                    Console.WriteLine("\n--- SORT MENU ---");
+                    Console.WriteLine("1. Sort By Name");
+                    Console.WriteLine("2. Sort By City");
+                    Console.WriteLine("3. Sort By State");
+                    Console.WriteLine("4. Sort By Zip");
+                    Console.WriteLine("5. Exit");
+
+                    if (!int.TryParse(Console.ReadLine(), out choice))
+                    {
+                        Console.WriteLine("Invalid input");
+                        continue;
+                    }
+
+                    switch (choice)
+                    {
+                        case 1:
+                            Console.WriteLine("Sort By Name : ");
+                            var list = addressbook.SortByName();
+                            list.Sort();
+
+                            Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"Address",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                            Console.WriteLine(new string('-', 90));
+
+                            foreach (var c in list)
+                            {
+                                Console.WriteLine(c);
+                            }
+                            break;
+
+                        case 2:
+                            Console.WriteLine("Sort By City : ");
+                            var Citylist=addressbook.SortByCity();
+                            Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                            Console.WriteLine(new string('-', 80));
+
+                            foreach (var c in Citylist)
+                            {
+                                Console.WriteLine(
+                                    $"{c.FirstName,-12} {c.LastName,-12} {c.City,-10} {c.State,-8} {c.ZipCode,-8} {c.PhoneNumber,-12} {c.Email}");
+                            }
+                            break;
+
+                        case 3:
+                            Console.WriteLine("Sort By State : ");
+                            var Statelist = addressbook.SortByState();
+                            Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                            Console.WriteLine(new string('-', 80));
+
+                            foreach (var c in Statelist)
+                            {
+                                Console.WriteLine(
+                                    $"{c.FirstName,-12} {c.LastName,-12} {c.City,-10} {c.State,-8} {c.ZipCode,-8} {c.PhoneNumber,-12} {c.Email}");
+                            }
+                            break;
+
+                        case 4:
+                            Console.WriteLine("Sort By Zip : ");
+                            var Ziplist = addressbook.SortByZip();
+                            Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                            Console.WriteLine(new string('-', 80));
+
+                            foreach (var c in Ziplist)
+                            {
+                                Console.WriteLine(
+                                    $"{c.FirstName,-12} {c.LastName,-12} {c.City,-10} {c.State,-8} {c.ZipCode,-8} {c.PhoneNumber,-12} {c.Email}");
+                            }
+                            break;
+
+                        case 5:
+                            Console.WriteLine("Exiting Sort Menu...");
+                            break;
+
+                        default:
+                            Console.WriteLine("Invalid option");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error : " + ex.Message);
+                }
+
+            } while (choice != 5);
         }
 
 

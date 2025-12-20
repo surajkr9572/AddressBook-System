@@ -219,5 +219,32 @@ namespace AddressBook.Service
             }
             return count;
         }
+        //get all Name in sorting Order
+        public List<Contacts> SortByName()
+        {
+            if (currentBookName == null)
+                return new List<Contacts>();
+
+            return new List<Contacts>(addressBooks[currentBookName]);
+        }
+        // Sorted By City
+        public List<Contacts> SortByCity(){
+            if(currentBookName==null) return new List<Contacts>();
+            return addressBooks[currentBookName].
+                OrderBy(x => x.City).ToList();
+        }
+        public List<Contacts> SortByState()
+        {
+            if(currentBookName==null)return new List<Contacts>();
+            return addressBooks[currentBookName].
+                OrderBy(x => x.State).ToList();
+        }
+        public List<Contacts> SortByZip()
+        {
+            if (currentBookName == null) return new List<Contacts>();
+            return addressBooks[currentBookName].
+                OrderBy(x=>x.ZipCode).ToList();
+        }
+
     }
 }

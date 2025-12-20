@@ -71,7 +71,7 @@ namespace AddressBook.Service
             }
             cityPersonMap[contact.City].Add(contact);
 
-            if (!statePersonMap.ContainsKey(contact.City))
+            if (!statePersonMap.ContainsKey(contact.State))
             {
                 statePersonMap[contact.State] = new List<Contacts>();
             }

@@ -308,14 +308,13 @@ namespace AddressBook
 
                         case 4:
                             var list = addressbook.GetAllContacts();
-
-                            Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
-                            Console.WriteLine(new string('-', 80));
+                            list.Sort();
+                            Console.WriteLine($"{"First Name",-12} {"Last Name",-12} {"Address",-12}{"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
+                            Console.WriteLine(new string('-', 90));
 
                             foreach (var c in list)
                             {
-                                Console.WriteLine(
-                                    $"{c.FirstName,-12} {c.LastName,-12} {c.City,-10} {c.State,-8} {c.ZipCode,-8} {c.PhoneNumber,-12} {c.Email}");
+                                Console.WriteLine(c);
                             }
                             break;
 

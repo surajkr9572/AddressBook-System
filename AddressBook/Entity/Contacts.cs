@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AddressBook.Entity
 {
-    public class Contacts
+    public class Contacts:IComparable<Contacts>
     {
         private string firstName;
         private string lastName;
@@ -49,11 +49,7 @@ namespace AddressBook.Entity
             get { return state; }
             set { state=value; }
         }
-        public string ZipCode
-        {
-            get { return zipCode; }
-            set { zipCode=value; }
-        }
+       
         public string PhoneNumber
         {
             get { return phoneNumber; }
@@ -87,6 +83,22 @@ namespace AddressBook.Entity
                 }
             }
         }
+        public string ZipCode
+        {
+            get { return zipCode; }
+            set
+            {
+                string pattern = @"^[0-9]{6}$";
+                if(Regex.IsMatch(value, pattern))
+                {
+                    zipCode=value;
+                }
+                else
+                {
+                    throw new ZipCodeException("Invalid ZipCode");
+                }
+            }
+        }
         public override bool Equals(object obj)
         {
             if(obj == null) return false;
@@ -95,6 +107,19 @@ namespace AddressBook.Entity
             
             return this.FirstName == other.FirstName;
 
+        }
+
+        //Override GetAllContacts method
+        public override string ToString()
+        {
+            return $"{firstName,-12}{lastName,-12}{address,-12}{city,-10}{state,-8}{zipCode,-8}{phoneNumber,-12}{Email}";
+        }
+
+        //Sort using Comparater
+
+        public int CompareTo(Contacts other)
+        {
+            return this.FirstName.CompareTo(other.FirstName);
         }
     }
 }

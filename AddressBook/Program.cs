@@ -152,7 +152,9 @@ namespace AddressBook
                         case 7:
                             Sort(service);
                             break;
-
+                        case 8:
+                            Console.WriteLine("Exit..");
+                            break;
                         default:
                             Console.WriteLine("Invalid option");
                            
@@ -185,7 +187,7 @@ namespace AddressBook
                 }
 
 
-            } while (mainChoice != 7); 
+            } while (mainChoice != 8); 
         }
 
         static void AddressBookMenu(IAddressBook addressbook)

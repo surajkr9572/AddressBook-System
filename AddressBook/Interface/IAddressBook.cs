@@ -9,7 +9,7 @@ namespace AddressBook.Interface
 {
     interface IAddressBook
     {
-        void AddContact(Contacts contact);
+        bool AddContact(Contacts contact);
         List<Contacts> GetAllContacts();
         void UpdateAddressBook(string FirstName, string uLastName, string uAddress, string uCity, string uState, string uZipcode, string uEmail);
         void DeletePerson(string name);

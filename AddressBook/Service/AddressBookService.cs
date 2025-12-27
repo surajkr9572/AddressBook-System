@@ -9,11 +9,20 @@ namespace AddressBook.Service
 {
     public class AddressBookService : IAddressBook
     {
-        private Dictionary<string, List<Contacts>> addressBooks = new Dictionary<string, List<Contacts>>();
-        private string currentBookName = null;
-        private Dictionary<string,List<Contacts>>cityPersonMap=new Dictionary<string, List<Contacts>>();
-        private Dictionary<string,List<Contacts>>statePersonMap=new Dictionary<string, List<Contacts>>();
-        // Create a new address book and set it as current
+        private readonly IAddressBookFileIO fileIO;
+        public Dictionary<string, List<Contacts>> addressBooks;
+        private string currentBookName;
+
+        private Dictionary<string, List<Contacts>> cityPersonMap = new();
+        private Dictionary<string, List<Contacts>> statePersonMap = new();
+
+        // 🔥 CONSTRUCTOR
+        public AddressBookService()
+        {
+            fileIO = new AddressBookFileIOService();
+            addressBooks = fileIO.ReadFromFile(); // UC-13
+        }
+
         public bool CreateAddressBook(string bookName)
         {
             if (addressBooks.ContainsKey(bookName))
@@ -21,65 +30,49 @@ namespace AddressBook.Service
 
             addressBooks[bookName] = new List<Contacts>();
             currentBookName = bookName;
+            fileIO.WriteToFile(addressBooks);
             return true;
         }
 
-        // Select an existing address book and set it as current
         public bool SelectAddressBook(string bookName)
         {
-            if (addressBooks.ContainsKey(bookName))
-            {
-                currentBookName = bookName;
-                return true;
-            }
-            return false;
+            if (!addressBooks.ContainsKey(bookName))
+                return false;
+
+            currentBookName = bookName;
+            return true;
         }
 
-        // Add a contact to the current address book
-        public void AddContact(Contacts contact)
+        public bool AddContact(Contacts contact)
         {
             if (currentBookName == null)
             {
-                Console.WriteLine("No Address Book selected.");
-                return;
+                Console.WriteLine("No AddressBook selected.");
+                return false;
             }
 
             var list = addressBooks[currentBookName];
-            //foreach (var c in list)
-            //{
-            //    if (c.FirstName.ToLower() == contact.FirstName.ToLower())
-            //    {
-            //        Console.WriteLine("Contact with this First Name already exists in current Address Book.");
-            //        return;
-            //    }
-            //}
-            var duplicateName = list.Find(c => c.Equals(contact));
-            if (duplicateName != null)
-            {
-                Console.WriteLine("Enter Person already Exists in my Current Address Book...");
-                return;
-            }
 
+            if (list.Any(c => c.Equals(contact)))
+            {
+                Console.WriteLine("Contact already exists.");
+                return false;
+            }
 
             list.Add(contact);
-            Console.WriteLine("Contact added successfully.");
+            fileIO.WriteToFile(addressBooks);
 
-            //add person contactList by city wise.
             if (!cityPersonMap.ContainsKey(contact.City))
-            {
                 cityPersonMap[contact.City] = new List<Contacts>();
-            }
             cityPersonMap[contact.City].Add(contact);
 
             if (!statePersonMap.ContainsKey(contact.State))
-            {
                 statePersonMap[contact.State] = new List<Contacts>();
-            }
             statePersonMap[contact.State].Add(contact);
 
+            return true;
         }
 
-        // Get all contacts from the current address book
         public List<Contacts> GetAllContacts()
         {
             if (currentBookName == null)
@@ -88,79 +81,45 @@ namespace AddressBook.Service
             return new List<Contacts>(addressBooks[currentBookName]);
         }
 
-        // Update a contact in the current address book
-        public void UpdateAddressBook(string firstName, string uLastName, string uAddress, string uCity, string uState, string uZipcode, string uEmail)
+        public void UpdateAddressBook(string firstName, string lastName,
+            string address, string city, string state, string zip, string email)
         {
-            if (currentBookName == null)
-            {
-                Console.WriteLine("No Address Book selected.");
-                return;
-            }
+            if (currentBookName == null) return;
 
-            var list = addressBooks[currentBookName];
-            Contacts contact = null;
+            var contact = addressBooks[currentBookName]
+                .FirstOrDefault(c => c.FirstName.Equals(firstName,
+                    StringComparison.OrdinalIgnoreCase));
 
-            foreach (var c in list)
-            {
-                if (c.FirstName.ToLower() == firstName.ToLower())
-                {
-                    contact = c;
-                    break; 
-                }
-            }
+            if (contact == null) return;
 
-            if (contact != null)
-            {
-                contact.LastName = uLastName;
-                contact.Address = uAddress;
-                contact.City = uCity;
-                contact.State = uState;
-                contact.ZipCode = uZipcode;
-                contact.Email = uEmail;
-                Console.WriteLine("Contact updated successfully.");
-            }
-            else
-            {
-                Console.WriteLine("Contact not found.");
-            }
+            contact.LastName = lastName;
+            contact.Address = address;
+            contact.City = city;
+            contact.State = state;
+            contact.ZipCode = zip;
+            contact.Email = email;
+
+            fileIO.WriteToFile(addressBooks);
         }
 
-        // Delete a contact from the current address book
         public void DeletePerson(string firstName)
         {
-            if (currentBookName == null)
-            {
-                Console.WriteLine("No Address Book selected.");
-                return;
-            }
+            if (currentBookName == null) return;
 
             var list = addressBooks[currentBookName];
-            Contacts contact = null;
+            var contact = list.FirstOrDefault(c =>
+                c.FirstName.Equals(firstName,
+                StringComparison.OrdinalIgnoreCase));
 
-            foreach (var c in list)
-            {
-                if (c.FirstName.ToLower() == firstName.ToLower())
-                {
-                    contact = c;
-                    break;
-                }
-            }
+            if (contact == null) return;
 
-            if (contact != null)
-            {
-                list.Remove(contact);
-                Console.WriteLine("Contact deleted successfully.");
-            }
-            else
-            {
-                Console.WriteLine("Contact not found.");
-            }
+            list.Remove(contact);
+            fileIO.WriteToFile(addressBooks);
         }
 
-        // List all address book names
         public List<string> GetAllAddressBookNames()
         {
-            return new List<string>(addressBooks.Keys);
+            return addressBooks.Keys.ToList();
         }
         public List<Contacts> SearchCity(string cityName)
         {

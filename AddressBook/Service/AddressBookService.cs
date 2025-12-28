@@ -16,10 +16,10 @@ namespace AddressBook.Service
         private Dictionary<string, List<Contacts>> cityPersonMap = new();
         private Dictionary<string, List<Contacts>> statePersonMap = new();
 
-        // 🔥 CONSTRUCTOR
+        //  CONSTRUCTOR
         public AddressBookService()
         {
-            fileIO = new AddressBookFileIOService();
+            fileIO = new CSVAddressBookFileIOService();
             addressBooks = fileIO.ReadFromFile(); // UC-13
         }
 

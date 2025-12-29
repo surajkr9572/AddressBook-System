@@ -19,7 +19,7 @@ namespace AddressBook.Service
         //  CONSTRUCTOR
         public AddressBookService()
         {
-            fileIO = new CSVAddressBookFileIOService();
+            fileIO = new JSONAddressBookFile();
             addressBooks = fileIO.ReadFromFile(); // UC-13
         }
 

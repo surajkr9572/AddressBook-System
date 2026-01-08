@@ -9,7 +9,7 @@ namespace AddressBook.Service
 {
     public class AddressBookService : IAddressBook
     {
-        private readonly IAddressBookFileIO fileIO;
+        private readonly IAddressBookFileIO fileJson, fileCSV, fileText;
         public Dictionary<string, List<Contacts>> addressBooks;
         private string currentBookName;
 
@@ -19,8 +19,10 @@ namespace AddressBook.Service
         //  CONSTRUCTOR
         public AddressBookService()
         {
-            fileIO = new JSONAddressBookFile();
-            addressBooks = fileIO.ReadFromFile(); // UC-13
+            fileJson = new JSONAddressBookFile();
+            fileCSV = new CSVAddressBookFileIOService();
+            fileText=new AddressBookFileIOService();
+            addressBooks = fileJson.ReadFromFile(); // UC-13
         }
 
         public bool CreateAddressBook(string bookName)
@@ -30,7 +32,7 @@ namespace AddressBook.Service
 
             addressBooks[bookName] = new List<Contacts>();
             currentBookName = bookName;
-            fileIO.WriteToFile(addressBooks);
+            WriteContactInAsyncForm();
             return true;
         }
 
@@ -60,7 +62,9 @@ namespace AddressBook.Service
             }
 
             list.Add(contact);
-            fileIO.WriteToFile(addressBooks);
+           WriteContactInAsyncForm();
+           
+           
 
             if (!cityPersonMap.ContainsKey(contact.City))
                 cityPersonMap[contact.City] = new List<Contacts>();
@@ -99,7 +103,7 @@ namespace AddressBook.Service
             contact.ZipCode = zip;
             contact.Email = email;
 
-            fileIO.WriteToFile(addressBooks);
+            WriteContactInAsyncForm();
         }
 
         public void DeletePerson(string firstName)
@@ -114,7 +118,7 @@ namespace AddressBook.Service
             if (contact == null) return;
 
             list.Remove(contact);
-            fileIO.WriteToFile(addressBooks);
+            WriteContactInAsyncForm();
         }
 
         public List<string> GetAllAddressBookNames()
@@ -204,6 +208,15 @@ namespace AddressBook.Service
             return addressBooks[currentBookName].
                 OrderBy(x=>x.ZipCode).ToList();
         }
+        private void WriteContactInAsyncForm()
+        {
+            Task.Run(async () =>
+            {
+                await fileJson.WriteToFileAsync(addressBooks);
+                await fileCSV.WriteToFileAsync(addressBooks);
+                await fileText.WriteToFileAsync(addressBooks);
 
+            });
+        }
     }
 }

@@ -64,9 +64,11 @@ namespace AddressBook.Service
 
             return addressBooks;
         }
-        public void WriteToFile(Dictionary<string, List<Contacts>> addressBooks)
-        {
-            using StreamWriter streamwriter = new StreamWriter(filePath,false);
+        
+        public async Task WriteToFileAsync(Dictionary<string, List<Contacts>> addressBooks)
+        {  
+
+            await using StreamWriter streamwriter = new StreamWriter(filePath,false);
             streamwriter.WriteLine($"{"AddressBook",-12} {"First Name",-12} {"Last Name",-12} {"Address",-12}{"City",-10} {"State",-8} {"Zip",-8} {"Phone",-12} {"Email"}");
             streamwriter.WriteLine(new string('-', 104));
             foreach (var list in addressBooks)

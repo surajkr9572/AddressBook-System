@@ -10,8 +10,9 @@ namespace AddressBook.Interface
 {
     interface IAddressBookFileIO
     {
-        public void WriteToFile(Dictionary<string, List<Contacts>> addressBooks);
+        public  Task WriteToFileAsync(Dictionary<string, List<Contacts>> addressBooks);
        
         Dictionary<string, List<Contacts>> ReadFromFile();
+       
     }
 }

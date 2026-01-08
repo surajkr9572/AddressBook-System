@@ -51,9 +51,9 @@ namespace AddressBook.Service
             return addressBooks;
         }
 
-        public void WriteToFile(Dictionary<string, List<Contacts>> addressBooks)
+        public async Task WriteToFileAsync(Dictionary<string, List<Contacts>> addressBooks)
         {
-            using StreamWriter writer = new StreamWriter(filePath, false);
+            await using StreamWriter writer = new StreamWriter(filePath, false);
 
             foreach (var book in addressBooks)
             {

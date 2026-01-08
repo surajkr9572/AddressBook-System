@@ -12,14 +12,14 @@ namespace AddressBook.Service
     public class JSONAddressBookFile : IAddressBookFileIO
     {
         private const string path= @"E:\Project3\AddressBook\AddressBook.json";
-        public void WriteToFile(Dictionary<string, List<Contacts>> addressBooks)
+        public async Task WriteToFileAsync(Dictionary<string, List<Contacts>> addressBooks) 
         {
             var option = new JsonSerializerOptions
             {
                 WriteIndented = true
             };
             string json=JsonSerializer.Serialize(addressBooks, option);
-            File.WriteAllText(path, json);
+            await File.WriteAllTextAsync(path, json);
         }
 
         //Read

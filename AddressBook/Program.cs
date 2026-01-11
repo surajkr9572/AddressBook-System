@@ -14,9 +14,19 @@ namespace AddressBook
             string banner =
                 "   ___     __   __                  ___            __  \r\n  / _ |___/ /__/ /______ ___ ___   / _ )___  ___  / /__\r\n / __ / _  / _  / __/ -_|_-<(_-<  / _  / _ \\/ _ \\/  '_/\r\n/_/ |_\\_,_/\\_,_/_/  \\__/___/___/ /____/\\___/\\___/_/\\_\\ \r\n";
             Console.WriteLine(banner);
-            IAddressBook service = new AddressBookService();
+            var fileServices = new List<IAddressBookFileIO>
+            {
+                new JSONAddressBookFile(),
+                new CSVAddressBookFileIOService(),
+                new AddressBookFileIOService(),
+                new DatabaseAddressBookService()
+                
+            };
 
-            int mainChoice=0;
+            IAddressBook service = new AddressBookService(fileServices);
+
+
+            int mainChoice =0;
             
             do
             {
@@ -29,7 +39,7 @@ namespace AddressBook
                     Console.WriteLine("4. Search Using State (Across All Address Books)");
                     Console.WriteLine("5. Count By City (Across All Address Books)");
                     Console.WriteLine("6. Count By State (Across All Address Books)");
-                    Console.WriteLine("7. Sort Contacts");
+                    Console.WriteLine("7. Get All AddressBook Name");
                     Console.WriteLine("8. Exit");
 
                     if (!int.TryParse(Console.ReadLine(), out mainChoice))
@@ -149,8 +159,13 @@ namespace AddressBook
                             int StateCount = service.CountState(StateName_Count);
                             Console.WriteLine($"{StateCount} Present is {StateName_Count} State.");
                             break;
+                       
                         case 7:
-                            Sort(service);
+                            var res=service.GetAllAddressBookNames();
+                            foreach(var i in res)
+                            {
+                                Console.Write(i+" ");
+                            }
                             break;
                         case 8:
                             Console.WriteLine("Exit..");
@@ -192,7 +207,9 @@ namespace AddressBook
 
         static void AddressBookMenu(IAddressBook addressbook)
         {
-            int choice=0;
+           // IAddressBook service = new AddressBookService(fileServices);
+
+            int choice =0;
 
             do
             {
@@ -203,7 +220,8 @@ namespace AddressBook
                     Console.WriteLine("2. Edit Contact");
                     Console.WriteLine("3. Delete Contact");
                     Console.WriteLine("4. View Contacts");
-                    Console.WriteLine("5. Back to Main Menu");
+                    Console.WriteLine("5. Sort Contacts");
+                    Console.WriteLine("6. Back to Main Menu");
 
                     if (!int.TryParse(Console.ReadLine(), out choice))
                     {
@@ -321,8 +339,10 @@ namespace AddressBook
                                     $"{c.FirstName,-12} {c.LastName,-12} {c.City,-10} {c.State,-8} {c.ZipCode,-8} {c.PhoneNumber,-12} {c.Email}");
                             }
                             break;
-
                         case 5:
+                            Sort(addressbook);
+                            break;
+                        case 6:
                             Console.WriteLine("Returning to Main Menu...");
                             break;
 
@@ -368,7 +388,7 @@ namespace AddressBook
                     PrintError("Unexpected Error : " + ex.Message);
                 }
 
-            } while (choice != 5);
+            } while (choice != 6);
         }
         static void PrintError(string message)
         {

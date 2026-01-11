@@ -2,27 +2,24 @@
 using AddressBook.Interface;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AddressBook.Service
 {
     public class AddressBookService : IAddressBook
     {
-        private readonly IAddressBookFileIO fileJson, fileCSV, fileText;
+        private readonly List<IAddressBookFileIO> fileServices;
         public Dictionary<string, List<Contacts>> addressBooks;
         private string currentBookName;
 
         private Dictionary<string, List<Contacts>> cityPersonMap = new();
         private Dictionary<string, List<Contacts>> statePersonMap = new();
 
-        //  CONSTRUCTOR
-        public AddressBookService()
+        public AddressBookService(List<IAddressBookFileIO> services)
         {
-            fileJson = new JSONAddressBookFile();
-            fileCSV = new CSVAddressBookFileIOService();
-            fileText=new AddressBookFileIOService();
-            addressBooks = fileJson.ReadFromFile(); // UC-13
+            fileServices = services;
+            addressBooks = fileServices.First().ReadFromFile();
         }
 
         public bool CreateAddressBook(string bookName)
@@ -30,7 +27,7 @@ namespace AddressBook.Service
             if (addressBooks.ContainsKey(bookName))
                 return false;
 
-            addressBooks[bookName] = new List<Contacts>();
+            addressBooks[bookName.ToLower()] = new List<Contacts>();
             currentBookName = bookName;
             WriteContactInAsyncForm();
             return true;
@@ -38,10 +35,10 @@ namespace AddressBook.Service
 
         public bool SelectAddressBook(string bookName)
         {
-            if (!addressBooks.ContainsKey(bookName))
+            if (!addressBooks.ContainsKey(bookName.ToLower()))
                 return false;
 
-            currentBookName = bookName;
+            currentBookName = bookName.ToLower();
             return true;
         }
 
@@ -62,9 +59,7 @@ namespace AddressBook.Service
             }
 
             list.Add(contact);
-           WriteContactInAsyncForm();
-           
-           
+            WriteContactInAsyncForm();
 
             if (!cityPersonMap.ContainsKey(contact.City))
                 cityPersonMap[contact.City] = new List<Contacts>();
@@ -125,97 +120,76 @@ namespace AddressBook.Service
         {
             return addressBooks.Keys.ToList();
         }
+
         public List<Contacts> SearchCity(string cityName)
         {
-            List<Contacts> result = new List<Contacts>();
+            List<Contacts> result = new();
 
             foreach (var entry in addressBooks)
-            {
-                foreach (Contacts c in entry.Value)
-                {
-                    if (c.City.ToLower()==cityName.ToLower())
-                    {
-                        result.Add(c);
-                    }
-                }
-            }
+                result.AddRange(entry.Value.Where(c =>
+                    c.City != null &&
+                    c.City.Equals(cityName, StringComparison.OrdinalIgnoreCase)));
 
             return result;
         }
 
         public List<Contacts> SearchState(string stateName)
         {
-            List<Contacts> result = new List<Contacts>();
+            List<Contacts> result = new();
 
             foreach (var entry in addressBooks)
-            {
-                foreach (Contacts c in entry.Value)
-                {
-                    if (c.State != null &&
-                        c.State.ToLower() == stateName.ToLower())
-                    {
-                        result.Add(c);
-                    }
-                }
-            }
+                result.AddRange(entry.Value.Where(c =>
+                    c.State != null &&
+                    c.State.Equals(stateName, StringComparison.OrdinalIgnoreCase)));
 
             return result;
-
         }
-        //count person in same city
+
         public int CountCity(string cityName)
         {
-            int count = 0;
-            if (cityPersonMap.ContainsKey(cityName))
-            {
-                count= cityPersonMap[cityName].Count;
-            }
-            return count;
+            return addressBooks
+                .SelectMany(book => book.Value)
+                .Count(c =>
+                    c.City != null &&
+                    c.City.Equals(cityName, StringComparison.OrdinalIgnoreCase));
         }
-        //count person in same state
+
         public int CountState(string stateName)
         {
-            int count = 0;
-            if (statePersonMap.ContainsKey(stateName))
-            {
-                count= statePersonMap[stateName].Count;
-            }
-            return count;
+            return addressBooks
+                .SelectMany(book => book.Value)
+                .Count(c =>
+                    c.State != null &&
+                    c.State.Equals(stateName, StringComparison.OrdinalIgnoreCase));
         }
-        //get all Name in sorting Order
+
+
         public List<Contacts> SortByName()
         {
-            if (currentBookName == null)
-                return new List<Contacts>();
-
+            if (currentBookName == null) return new();
             return new List<Contacts>(addressBooks[currentBookName]);
         }
-        // Sorted By City
-        public List<Contacts> SortByCity(){
-            if(currentBookName==null) return new List<Contacts>();
-            return addressBooks[currentBookName].
-                OrderBy(x => x.City).ToList();
-        }
-        public List<Contacts> SortByState()
-        {
-            if(currentBookName==null)return new List<Contacts>();
-            return addressBooks[currentBookName].
-                OrderBy(x => x.State).ToList();
-        }
-        public List<Contacts> SortByZip()
-        {
-            if (currentBookName == null) return new List<Contacts>();
-            return addressBooks[currentBookName].
-                OrderBy(x=>x.ZipCode).ToList();
-        }
+
+        public List<Contacts> SortByCity() =>
+            currentBookName == null ? new() :
+            addressBooks[currentBookName].OrderBy(x => x.City).ToList();
+
+        public List<Contacts> SortByState() =>
+            currentBookName == null ? new() :
+            addressBooks[currentBookName].OrderBy(x => x.State).ToList();
+
+        public List<Contacts> SortByZip() =>
+            currentBookName == null ? new() :
+            addressBooks[currentBookName].OrderBy(x => x.ZipCode).ToList();
+
         private void WriteContactInAsyncForm()
         {
             Task.Run(async () =>
             {
-                await fileJson.WriteToFileAsync(addressBooks);
-                await fileCSV.WriteToFileAsync(addressBooks);
-                await fileText.WriteToFileAsync(addressBooks);
-
+                foreach (var service in fileServices)
+                {
+                    await service.WriteToFileAsync(addressBooks);
+                }
             });
         }
     }

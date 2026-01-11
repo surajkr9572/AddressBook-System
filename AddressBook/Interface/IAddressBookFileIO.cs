@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AddressBook.Interface
 {
-    interface IAddressBookFileIO
+    public interface IAddressBookFileIO
     {
         public  Task WriteToFileAsync(Dictionary<string, List<Contacts>> addressBooks);
        

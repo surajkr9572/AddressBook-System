@@ -1,0 +1,29 @@
+﻿using AddressBook.Entity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AddressBook.Interface
+{
+    interface IAddressBook
+    {
+        bool AddContact(Contacts contact);
+        List<Contacts> GetAllContacts();
+        void UpdateAddressBook(string FirstName, string uLastName, string uAddress, string uCity, string uState, string uZipcode, string uEmail);
+        void DeletePerson(string name);
+        bool SelectAddressBook(string bookName);
+        bool CreateAddressBook(string bookName);
+        List<string> GetAllAddressBookNames();
+
+        List<Contacts> SearchCity(string city);
+        List<Contacts> SearchState(string state);
+        int CountCity(string city);
+        int CountState(string state);
+        List<Contacts> SortByName();
+        List<Contacts> SortByCity();
+        List<Contacts> SortByState();
+        List<Contacts> SortByZip();
+    }
+}
